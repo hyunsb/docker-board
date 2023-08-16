@@ -1,10 +1,55 @@
 # 원티드 프리 온보딩 (Java / Spring Boot)
-로그인/회원가입, 간단한 게시판 기능을 가지는 RESTful API 서버를 구현한다.
+로그인/회원가입, 간단한 게시판 기능을 가지는 RESTful API 서버를 구현한다. <br>
+도커와 도커 컴포즈를 통해 이미지를 생성하고 배포할 수 있도록 한다.
 
 > **개발 인원** : 정현수 <br />
-> **개발 기간** : 2023. 08. 10. 목 ~ 2023. 08. 14. 월 <br />
-> **개발 환경** : Java11 + Spring Boot 2.7.14 + MySQL 8.0
+> **개발 환경** : Java11 + Spring Boot 2.7.14 + MySQL 8.0 <br>
+> **Origin Project Repo** : https://github.com/hyunsb/wanted-pre-onboarding-backend
 
+<br>
+
+## 시작하기
+### docker-compose.yml
+``` yaml
+version: '3'
+services:
+  db:
+    build: 
+      context: db
+      dockerfile: Dockerfile
+    ports:
+      - "{호스트 시스템 포트}:{컨테이너 DB 포트}"
+    volumes:
+      - {DB 볼륨 저장할 로컬 디렉터리 경로}
+    networks:
+      - network
+  server:
+    build: 
+      context: ./server
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "{호스트 시스템 포트}:{컨테이너 서버 포트}"
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: {DB 컨테이너 URL}
+      SPRING_DATASOURCE_DRIVER: {DB 드라이버}
+      SPRING_DATASOURCE_USERNAME: {DB 유저네임}
+      SPRING_DATASOURCE_PASSWORD: {DB 패스워드}
+    networks:
+      - network
+
+networks:
+  network:
+```
+docker-compose.yml 작성 이후 
+``` bash
+$ docker-compose up -d # 백그라운드로 실행하는 경우
+$ docker-compose up    # 포그라운드로 실행하는 경우
+```
+
+<br><br>
 
 ## API 명세
 
